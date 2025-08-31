@@ -1,0 +1,28 @@
+package com.example.mohan.entity;
+
+import com.example.mohan.enums.Gender;
+import jakarta.persistence.*;
+import lombok.Data;
+
+@Entity
+@Data
+public class ContactInfo {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+
+    @Column(unique = true)
+    private String email;
+
+    private String mobileNumber;
+    private String address;
+    private Integer age;
+
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
+
+    private boolean kyc;
+}

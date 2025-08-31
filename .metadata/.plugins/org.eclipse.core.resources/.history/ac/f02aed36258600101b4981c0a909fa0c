@@ -1,0 +1,29 @@
+package com.example.mohan.controller;
+
+import com.example.mohan.dto.NotificationRequestDTO;
+import com.example.mohan.service.NotificationService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/v1/notifications")
+@RequiredArgsConstructor
+public class NotificationController {
+
+    private final NotificationService notificationService;
+
+    // Remove this if no backend templating:
+    // @PostMapping("/payment/{paymentId}/sendEmail")
+    // public void sendPaymentNotification(@PathVariable Long paymentId,
+    //                                    @RequestParam String recipientEmail) {
+    //     notificationService.sendPaymentNotification(paymentId, recipientEmail);
+    // }
+
+    @PostMapping("/sendEmail")
+    @ResponseStatus(HttpStatus.OK)
+    public void sendCustomEmailNotification(@Valid @RequestBody NotificationRequestDTO notificationRequestDTO) {
+        notificationService.sendCustomNotification(notificationRequestDTO);
+    }
+}

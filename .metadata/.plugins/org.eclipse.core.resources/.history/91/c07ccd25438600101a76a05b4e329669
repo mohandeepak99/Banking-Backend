@@ -1,0 +1,5 @@
+package com.example.mohan.controller.auth;
+
+public class AuthController {
+
+}

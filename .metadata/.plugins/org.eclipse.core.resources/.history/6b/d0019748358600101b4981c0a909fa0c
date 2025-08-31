@@ -1,0 +1,56 @@
+package com.example.mohan.controller;
+
+import com.example.mohan.dto.ProfileDTO;
+import com.example.mohan.service.ProfileService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/v1/accounts")
+@RequiredArgsConstructor
+public class ProfileController {
+
+    private final ProfileService profileService;
+
+    @PostMapping
+    public ProfileDTO saveProfile(@Valid @RequestBody ProfileDTO profileDTO) {
+        return profileService.saveProfile(profileDTO);
+    }
+
+    @GetMapping("/{profileId}")
+    public ProfileDTO getProfileById(@PathVariable Long profileId) {
+        return profileService.getProfileById(profileId);
+    }
+
+    @GetMapping("/accountNumber/{accountNumber}")
+    public ProfileDTO getProfileByAccountNumber(@PathVariable String accountNumber) {
+        return profileService.getProfileByAccountNumber(accountNumber);
+    }
+
+    @GetMapping
+    public Page<ProfileDTO> getAllProfiles(@RequestParam(defaultValue = "0") int page,
+                                           @RequestParam(defaultValue = "10") int size) {
+        return profileService.getAllProfiles(PageRequest.of(page, size));
+    }
+
+    @PostMapping("/debit")
+    public ProfileDTO debitAccount(@RequestParam String accountNumber, @RequestParam double amount) {
+        return profileService.debitAccountBalance(accountNumber, amount);
+    }
+
+    @PostMapping("/credit")
+    public ProfileDTO creditAccount(@RequestParam String accountNumber, @RequestParam double amount) {
+        return profileService.creditAccountBalance(accountNumber, amount);
+    }
+    
+    @DeleteMapping("/{profileId}")
+    
+    public void deleteProfileById(@PathVariable Long profileId) {
+        profileService.deleteProfileById(profileId);
+    }
+
+
+}

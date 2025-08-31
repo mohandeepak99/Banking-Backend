@@ -1,0 +1,30 @@
+package com.example.mohan.service;
+
+import com.example.mohan.dto.PaymentResponseDTO;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+
+@Service
+@RequiredArgsConstructor
+public class TemplateMessageService {
+
+    private final TemplateEngine templateEngine;
+
+    public String generatePaymentSuccessMessage(PaymentResponseDTO payment) {
+        Context context = new Context();
+        context.setVariable("amount", payment.getAmount());
+        context.setVariable("senderAccount", formatAccountNumber(payment.getSenderAccountNumber()));
+        context.setVariable("receiverAccount", formatAccountNumber(payment.getReceiverAccountNumber()));
+        context.setVariable("paymentDate", payment.getPaymentTime().toLocalDate());
+        context.setVariable("status", payment.getPaymentStatus().name());
+
+        return templateEngine.process("payment-success.html", context);
+    }
+
+    private String formatAccountNumber(String accountNumber) {
+        if (accountNumber == null || accountNumber.length() < 4) return accountNumber;
+        return "XXXX-XXXX-XXXX-" + accountNumber.substring(accountNumber.length() - 4);
+    }
+}

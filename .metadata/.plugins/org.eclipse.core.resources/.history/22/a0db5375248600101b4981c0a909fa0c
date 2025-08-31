@@ -1,0 +1,18 @@
+package com.example.mohan.feign;
+
+import com.example.mohan.dto.ProfileDTO;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.*;
+
+@FeignClient(name = "account-service", url = "${account.service.url}")
+public interface AccountFeignClient {
+
+    @GetMapping("/api/v1/accounts/accountNumber/{accountNumber}")
+    ProfileDTO getAccountByAccountNumber(@PathVariable("accountNumber") String accountNumber);
+
+    @PostMapping("/api/v1/accounts/debit")
+    void debitAccount(@RequestParam String accountNumber, @RequestParam double amount);
+
+    @PostMapping("/api/v1/accounts/credit")
+    void creditAccount(@RequestParam String accountNumber, @RequestParam double amount);
+}

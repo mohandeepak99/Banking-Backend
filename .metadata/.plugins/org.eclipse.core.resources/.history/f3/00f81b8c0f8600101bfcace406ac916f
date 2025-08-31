@@ -1,0 +1,31 @@
+package com.example.mohan.entity;
+
+import com.example.mohan.enums.AccountType;
+import jakarta.persistence.*;
+import lombok.Data;
+
+@Entity
+@Data
+public class Profile {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long profileId;
+
+    private Long contactId;
+
+    private String username;
+
+    @Column(unique = true)
+    private String email;
+
+    @Column(unique = true)
+    private String accountNumber;
+
+    @Enumerated(EnumType.STRING)
+    private AccountType accountType;
+
+    private boolean kyc;
+
+    private double balance;
+}

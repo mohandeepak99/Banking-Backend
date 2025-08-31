@@ -1,0 +1,5 @@
+package com.example.mohan.config;
+
+public class SecurityConfig {
+
+}

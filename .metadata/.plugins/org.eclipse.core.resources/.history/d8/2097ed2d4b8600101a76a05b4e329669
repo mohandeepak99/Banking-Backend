@@ -1,0 +1,5 @@
+package com.example.mohan.utils;
+
+public class JwtUtil {
+
+}

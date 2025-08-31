@@ -1,0 +1,10 @@
+public class ContactInfoDTO {
+    private Long id;
+    private String name;
+    private String email;
+    private String mobileNumber;
+    private String address;
+    private Integer age;
+    private Gender gender;
+    private boolean kyc;
+}

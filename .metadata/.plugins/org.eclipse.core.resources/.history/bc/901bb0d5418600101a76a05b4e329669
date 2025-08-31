@@ -1,0 +1,14 @@
+package com.example.mohan.auth.dto;
+
+import com.example.mohan.auth.enums.UserRole;
+
+import lombok.Data;
+
+@Data
+public class UserDto {
+    private long id;
+    private String name;
+    private String email;
+    private String password;
+    private UserRole userRole;
+}

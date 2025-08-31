@@ -1,0 +1,42 @@
+package com.example.mohan.dto;
+
+import com.example.mohan.enums.Gender;
+import jakarta.validation.constraints.*;
+import lombok.Data;
+
+@Data
+public class ContactInfoDTO {
+
+    private Long contactId;
+
+    @NotBlank(message = "First name is mandatory")
+    @Size(max = 100)
+    private String firstName;
+
+    @NotBlank(message = "Last name is mandatory")
+    @Size(max = 100)
+    private String lastName;
+
+    @NotBlank(message = "Email is mandatory")
+    @Email(message = "Email should be valid")
+    @Size(max = 150)
+    private String email;
+
+    @NotBlank(message = "Mobile number is mandatory")
+    @Pattern(regexp = "^[0-9]{10}$", message = "Mobile number must be 10 digits")
+    private String mobileNumber;
+
+    @NotBlank(message = "Address is mandatory")
+    @Size(max = 255)
+    private String address;
+
+    @NotNull(message = "Age is mandatory")
+    @Min(value = 18, message = "Age should not be less than 18")
+    @Max(value = 120, message = "Age should not exceed 120")
+    private Integer age;
+
+    @NotNull(message = "Gender is mandatory")
+    private Gender gender;
+
+    private boolean kyc;
+}

@@ -1,0 +1,5 @@
+package com.example.mohan.dto;
+
+public class AuthenticationResponse {
+
+}

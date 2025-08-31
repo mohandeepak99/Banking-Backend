@@ -1,0 +1,21 @@
+package com.example.mohan.service;
+
+import com.example.mohan.dto.NotificationRequestDTO;
+import com.example.mohan.exception.NotificationException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class NotificationService {
+
+    private final EmailSenderUtil emailSenderUtil;
+
+    public void sendCustomNotification(NotificationRequestDTO request) {
+        try {
+            emailSenderUtil.sendEmail(request.getRecipientEmail(), request.getSubject(), request.getBody());
+        } catch (Exception e) {
+            throw new NotificationException("Failed to send notification: " + e.getMessage());
+        }
+    }
+}

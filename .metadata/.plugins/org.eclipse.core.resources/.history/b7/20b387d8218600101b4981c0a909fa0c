@@ -1,0 +1,57 @@
+package com.example.mohan.service;
+
+import com.example.mohan.dto.ContactInfoDTO;
+import com.example.mohan.entity.ContactInfo;
+import com.example.mohan.exception.CustomerNotFoundException;
+import com.example.mohan.repository.ContactInfoRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class ContactInfoService {
+
+    private final ContactInfoRepository contactInfoRepository;
+
+    public ContactInfoDTO saveContactInfo(ContactInfoDTO contactInfoDTO) {
+        ContactInfo contactInfo = new ContactInfo();
+        contactInfo.setName(contactInfoDTO.getName());
+        contactInfo.setEmail(contactInfoDTO.getEmail());
+        contactInfo.setMobileNumber(contactInfoDTO.getMobileNumber());
+        contactInfo.setAddress(contactInfoDTO.getAddress());
+        contactInfo.setAge(contactInfoDTO.getAge());
+        contactInfo.setGender(contactInfoDTO.getGender());
+        contactInfo.setKyc(contactInfoDTO.isKyc());
+
+        ContactInfo saved = contactInfoRepository.save(contactInfo);
+
+        ContactInfoDTO response = new ContactInfoDTO();
+        response.setId(saved.getId());
+        response.setName(saved.getName());
+        response.setEmail(saved.getEmail());
+        response.setMobileNumber(saved.getMobileNumber());
+        response.setAddress(saved.getAddress());
+        response.setAge(saved.getAge());
+        response.setGender(saved.getGender());
+        response.setKyc(saved.isKyc());
+
+        return response;
+    }
+
+    public ContactInfoDTO getContactInfoById(Long id) {
+        ContactInfo contactInfo = contactInfoRepository.findById(id)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer not found with id: " + id));
+
+        ContactInfoDTO response = new ContactInfoDTO();
+        response.setId(contactInfo.getId());
+        response.setName(contactInfo.getName());
+        response.setEmail(contactInfo.getEmail());
+        response.setMobileNumber(contactInfo.getMobileNumber());
+        response.setAddress(contactInfo.getAddress());
+        response.setAge(contactInfo.getAge());
+        response.setGender(contactInfo.getGender());
+        response.setKyc(contactInfo.isKyc());
+
+        return response;
+    }
+}

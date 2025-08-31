@@ -1,0 +1,72 @@
+package com.example.mohan.config;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.gateway.route.RouteLocator;
+import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import com.example.mohan.filter.JwtAuthenticationFilter;
+
+@Configuration
+public class GatewayConfig {
+
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @Bean
+    public RouteLocator routes(RouteLocatorBuilder builder) {
+        return builder.routes()
+
+            // Authentication service, public
+            .route("auth-service", r -> r.path("/api/auth/**")
+                .uri("lb://USER-AUTHENTICATION-SERVICE"))
+
+            // Customer service, requires CUSTOMER, MANAGER, ADMIN
+            .route("customer-service", r -> r.path("/api/customer/**")
+                .filters(f -> {
+                    JwtAuthenticationFilter.Config config = new JwtAuthenticationFilter.Config();
+                    config.setRole("CUSTOMER,MANAGER,ADMIN");
+                    return f.filter(jwtAuthenticationFilter.apply(config));
+                })
+                .uri("lb://CUSTOMER-SERVICE"))
+
+            // Account service, requires CUSTOMER, MANAGER, ADMIN
+            .route("account-service", r -> r.path("/api/accounts/**")
+                .filters(f -> {
+                    JwtAuthenticationFilter.Config config = new JwtAuthenticationFilter.Config();
+                    config.setRole("CUSTOMER,MANAGER,ADMIN");
+                    return f.filter(jwtAuthenticationFilter.apply(config));
+                })
+                .uri("lb://ACCOUNT-SERVICE"))
+
+            // Payment service, requires CUSTOMER, MANAGER, ADMIN
+            .route("payment-service", r -> r.path("/api/payment/**")
+                .filters(f -> {
+                    JwtAuthenticationFilter.Config config = new JwtAuthenticationFilter.Config();
+                    config.setRole("CUSTOMER,MANAGER,ADMIN");
+                    return f.filter(jwtAuthenticationFilter.apply(config));
+                })
+                .uri("lb://PAYMENT-SERVICE"))
+
+            // Notification service, MANAGER, ADMIN only
+            .route("notification-service", r -> r.path("/api/notification/**")
+                .filters(f -> {
+                    JwtAuthenticationFilter.Config config = new JwtAuthenticationFilter.Config();
+                    config.setRole("MANAGER,ADMIN");
+                    return f.filter(jwtAuthenticationFilter.apply(config));
+                })
+                .uri("lb://NOTIFICATION-SERVICE"))
+
+            // Audit service, MANAGER, ADMIN only
+            .route("audit-service", r -> r.path("/api/audit/**")
+                .filters(f -> {
+                    JwtAuthenticationFilter.Config config = new JwtAuthenticationFilter.Config();
+                    config.setRole("MANAGER,ADMIN");
+                    return f.filter(jwtAuthenticationFilter.apply(config));
+                })
+                .uri("lb://AUDIT-SERVICE"))
+
+            .build();
+    }
+}

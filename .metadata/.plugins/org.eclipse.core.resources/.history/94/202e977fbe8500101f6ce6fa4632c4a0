@@ -1,0 +1,13 @@
+package com.example.mohan;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class CuatomerServiceApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(CuatomerServiceApplication.class, args);
+	}
+
+}

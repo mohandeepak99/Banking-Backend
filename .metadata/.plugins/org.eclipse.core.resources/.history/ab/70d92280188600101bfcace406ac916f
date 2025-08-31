@@ -1,0 +1,64 @@
+package com.example.mohan.service;
+
+import com.example.mohan.dto.PaymentRequestDTO;
+import com.example.mohan.dto.PaymentResponseDTO;
+import com.example.mohan.dto.ProfileDTO;
+import com.example.mohan.entity.Payment;
+import com.example.mohan.enums.PaymentStatus;
+import com.example.mohan.exception.PaymentException;
+import com.example.mohan.repository.PaymentRepository;
+import com.example.mohan.feign.AccountFeignClient;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+
+@Service
+@RequiredArgsConstructor
+public class PaymentService {
+
+    private final PaymentRepository paymentRepository;
+    private final AccountFeignClient accountFeignClient;
+
+    public PaymentResponseDTO doPayment(PaymentRequestDTO request) {
+        // Validate sender account
+        ProfileDTO senderAccount = accountFeignClient.getAccountByAccountNumber(request.getSenderAccountNumber());
+        if (senderAccount == null) {
+            throw new PaymentException("Sender account not found: " + request.getSenderAccountNumber());
+        }
+
+        // Validate receiver account
+        ProfileDTO receiverAccount = accountFeignClient.getAccountByAccountNumber(request.getReceiverAccountNumber());
+        if (receiverAccount == null) {
+            throw new PaymentException("Receiver account not found: " + request.getReceiverAccountNumber());
+        }
+
+        // Check sufficient balance
+        if (senderAccount.getBalance() < request.getAmount()) {
+            throw new PaymentException("Insufficient balance in sender account");
+        }
+
+        // Proceed to create payment record
+        Payment payment = new Payment();
+        payment.setSenderAccountNumber(request.getSenderAccountNumber());
+        payment.setSenderName(request.getSenderName());
+        payment.setReceiverAccountNumber(request.getReceiverAccountNumber());
+        payment.setReceiverName(request.getReceiverName());
+        payment.setAmount(request.getAmount());
+        payment.setPaymentTime(LocalDateTime.now());
+        payment.setPaymentStatus(PaymentStatus.DONE);
+
+        Payment saved = paymentRepository.save(payment);
+
+        // Map to response DTO
+        PaymentResponseDTO response = new PaymentResponseDTO();
+        response.setPaymentId(saved.getPaymentId());
+        response.setSenderAccountNumber(saved.getSenderAccountNumber());
+        response.setReceiverAccountNumber(saved.getReceiverAccountNumber());
+        response.setPaymentTime(saved.getPaymentTime());
+        response.setAmount(saved.getAmount());
+        response.setPaymentStatus(saved.getPaymentStatus());
+
+        return response;
+    }
+}
