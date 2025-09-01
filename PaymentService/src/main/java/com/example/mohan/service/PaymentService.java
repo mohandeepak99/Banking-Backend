@@ -1,6 +1,6 @@
 package com.example.mohan.service;
 
-import com.example.mohan.dto.AuditLogDTO;
+import com.example.mohan.dto.PaymentEventDTO; // Import the new DTO
 import com.example.mohan.dto.PaymentRequestDTO;
 import com.example.mohan.dto.PaymentResponseDTO;
 import com.example.mohan.dto.ProfileDTO;
@@ -8,7 +8,7 @@ import com.example.mohan.entity.Payment;
 import com.example.mohan.enums.PaymentStatus;
 import com.example.mohan.exception.PaymentException;
 import com.example.mohan.feign.AccountFeignClient;
-import com.example.mohan.feign.AuditClient;
+import com.example.mohan.kafka.PaymentProducer;
 import com.example.mohan.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final AccountFeignClient accountFeignClient;
-    private final AuditClient auditClient;
+    private final PaymentProducer paymentProducer;
 
     public PaymentResponseDTO doPayment(PaymentRequestDTO request) {
 
@@ -58,18 +58,18 @@ public class PaymentService {
         accountFeignClient.debitAccount(request.getSenderAccountNumber(), request.getAmount());
         accountFeignClient.creditAccount(request.getReceiverAccountNumber(), request.getAmount());
 
-        // Send audit log
-        AuditLogDTO auditLogDTO = new AuditLogDTO();
-        auditLogDTO.setAction("Payment Created");
-        auditLogDTO.setEntityName("Payment");
-        auditLogDTO.setEntityId(String.valueOf(saved.getPaymentId()));
-        // Assuming senderAccount.getContactId()/customerId available; else fetch accordingly
-        auditLogDTO.setCustomerId(senderAccount.getContactId());
-        auditLogDTO.setTimestamp(LocalDateTime.now());
-        auditLogDTO.setDetails(String.format("Amount: %.2f, From: %s, To: %s, Status: %s",
-                saved.getAmount(), saved.getSenderAccountNumber(), saved.getReceiverAccountNumber(), saved.getPaymentStatus()));
 
-        auditClient.sendAuditLog(auditLogDTO);
+        // Publish event to Kafka with the sender's email
+        PaymentEventDTO paymentEventDTO = new PaymentEventDTO();
+        paymentEventDTO.setPaymentId(saved.getPaymentId());
+        paymentEventDTO.setSenderAccountNumber(saved.getSenderAccountNumber());
+        paymentEventDTO.setSenderEmail(senderAccount.getEmail()); // Use the email from the ProfileDTO
+        paymentEventDTO.setReceiverAccountNumber(saved.getReceiverAccountNumber());
+        paymentEventDTO.setAmount(saved.getAmount());
+        paymentEventDTO.setPaymentTime(saved.getPaymentTime());
+        paymentEventDTO.setPaymentStatus(saved.getPaymentStatus());
+
+        paymentProducer.sendPaymentEvent(paymentEventDTO);
 
         // Map to response DTO
         PaymentResponseDTO response = new PaymentResponseDTO();

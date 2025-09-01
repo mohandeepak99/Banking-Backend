@@ -5,12 +5,13 @@ import lombok.Data;
 
 @Data
 public class ProfileDTO {
-    private Long profileId;
-    private Long contactId;
-    private String username;
-    private String email;
+    private Long id;
     private String accountNumber;
+    private String firstName;
+    private String lastName;
+    private String email; // Add the email field here
+    private String phoneNumber;
     private AccountType accountType;
-    private boolean kyc;
     private double balance;
+    private Long contactId;
 }

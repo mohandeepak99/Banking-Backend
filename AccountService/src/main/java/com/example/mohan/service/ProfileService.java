@@ -1,11 +1,11 @@
 package com.example.mohan.service;
 
-import com.example.mohan.dto.AuditLogDTO;
+
 import com.example.mohan.dto.CustomerDTO;
 import com.example.mohan.dto.ProfileDTO;
 import com.example.mohan.entity.Profile;
 import com.example.mohan.exception.ProfileNotFoundException;
-import com.example.mohan.feign.AuditClient;
+
 import com.example.mohan.feign.CustomerFeignClient;
 import com.example.mohan.repository.ProfileRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ public class ProfileService {
 
     private final ProfileRepository profileRepository;
     private final CustomerFeignClient customerFeignClient;
-    private final AuditClient auditClient;
+
 
     public ProfileDTO saveProfile(ProfileDTO profileDTO) {
 
@@ -40,7 +40,7 @@ public class ProfileService {
 
         Profile saved = profileRepository.save(profile);
 
-        sendAuditLog("Profile Created", "Profile", String.valueOf(saved.getProfileId()), saved.getContactId(), "Profile created");
+        
 
         return mapToDTO(saved);
     }
@@ -72,8 +72,7 @@ public class ProfileService {
         profile.setBalance(profile.getBalance() - amount);
         Profile updated = profileRepository.save(profile);
 
-        sendAuditLog("Account Debited", "Profile", String.valueOf(updated.getProfileId()), updated.getContactId(),
-                "Debited amount: " + amount);
+        
 
         return mapToDTO(updated);
     }
@@ -85,8 +84,7 @@ public class ProfileService {
         profile.setBalance(profile.getBalance() + amount);
         Profile updated = profileRepository.save(profile);
 
-        sendAuditLog("Account Credited", "Profile", String.valueOf(updated.getProfileId()), updated.getContactId(),
-                "Credited amount: " + amount);
+        
 
         return mapToDTO(updated);
     }
@@ -105,17 +103,7 @@ public class ProfileService {
         return dto;
     }
 
-    private void sendAuditLog(String action, String entityName, String entityId, Long customerId, String details) {
-        AuditLogDTO auditLogDTO = new AuditLogDTO();
-        auditLogDTO.setAction(action);
-        auditLogDTO.setEntityName(entityName);
-        auditLogDTO.setEntityId(entityId);
-        auditLogDTO.setCustomerId(customerId);
-        auditLogDTO.setTimestamp(java.time.LocalDateTime.now());
-        auditLogDTO.setDetails(details);
-
-        auditClient.sendAuditLog(auditLogDTO);
-    }
+    
     
     public void deleteProfileById(Long profileId) {
     	Profile profile = profileRepository.findById(profileId)
@@ -123,7 +111,7 @@ public class ProfileService {
 
     		Long customerId = profile.getContactId();
     		profileRepository.deleteById(profileId);
-    		sendAuditLog("Profile Deleted", "Profile", String.valueOf(profileId), customerId, "Deleted profile with id " + profileId);
+    		
 
     }
 

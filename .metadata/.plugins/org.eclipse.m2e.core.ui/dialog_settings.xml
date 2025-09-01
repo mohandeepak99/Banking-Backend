@@ -6,6 +6,7 @@
 	</section>
 	<section name="MavenProjectImportWizardPage">
 		<list key="rootDirectory">
+			<item value="D:\Quiz-Microservice\Quiz-Microservices-Industrial\Kafka-Email-sending\Email-Service"/>
 			<item value="D:\Microservices\Config-Server"/>
 		</list>
 		<list key="projectNameTemplate">

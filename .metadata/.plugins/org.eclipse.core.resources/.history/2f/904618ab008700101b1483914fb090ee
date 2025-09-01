@@ -1,0 +1,26 @@
+package com.example.mohan.service;
+
+import com.example.mohan.dto.PaymentResponseDTO;
+import com.example.mohan.exception.NotificationException;
+import com.example.mohan.util.EmailSenderUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class NotificationService {
+
+    private final EmailSenderUtil emailSenderUtil;
+
+    public void sendPaymentEmailNotification(PaymentResponseDTO request) {
+        try {
+            String to = "some_email@example.com"; // Placeholder, as email is not available in the DTO
+            String subject = "Payment Confirmation";
+            String body = String.format("Payment with ID: %d, Amount: %.2f, Status: %s",
+                    request.getPaymentId(), request.getAmount(), request.getPaymentStatus());
+            emailSenderUtil.sendEmail(to, subject, body);
+        } catch (Exception e) {
+            throw new NotificationException("Failed to send notification for payment ID: " + request.getPaymentId(), e);
+        }
+    }
+}

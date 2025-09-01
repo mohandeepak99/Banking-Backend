@@ -1,0 +1,27 @@
+package com.example.mohan.service;
+
+import com.example.mohan.dto.PaymentResponseDTO;
+import com.example.mohan.exception.NotificationException;
+import com.example.mohan.util.EmailSenderUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class NotificationService {
+
+    private final EmailSenderUtil emailSenderUtil;
+
+    public void sendPaymentEmailNotification(PaymentResponseDTO paymentResponseDTO) {
+        try {
+            // Logic to construct the email content from the payment details
+            String recipientEmail = "user@example.com"; // You'll need a way to get the user's email, e.g., from a separate service or the Kafka message
+            String subject = "Payment Confirmation";
+            String body = String.format("Your payment of %.2f with ID %d was successful.", paymentResponseDTO.getAmount(), paymentResponseDTO.getPaymentId());
+
+            emailSenderUtil.sendEmail(recipientEmail, subject, body);
+        } catch (Exception e) {
+            throw new NotificationException("Failed to send notification for payment ID: " + paymentResponseDTO.getPaymentId(), e);
+        }
+    }
+}

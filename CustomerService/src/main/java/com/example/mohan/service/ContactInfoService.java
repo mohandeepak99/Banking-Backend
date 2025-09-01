@@ -1,10 +1,8 @@
 package com.example.mohan.service;
 
-import com.example.mohan.dto.AuditLogDTO;
 import com.example.mohan.dto.ContactInfoDTO;
 import com.example.mohan.entity.ContactInfo;
 import com.example.mohan.exception.CustomerNotFoundException;
-import com.example.mohan.feign.AuditClient;
 import com.example.mohan.repository.ContactInfoRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,13 +15,11 @@ import java.time.LocalDateTime;
 public class ContactInfoService {
 
     private final ContactInfoRepository contactInfoRepository;
-    private final AuditClient auditClient;
 
     public ContactInfoDTO saveContactInfo(@Valid ContactInfoDTO contactInfoDTO) {
         ContactInfo contactInfo = toEntity(contactInfoDTO);
         ContactInfo saved = contactInfoRepository.save(contactInfo);
-        sendAuditLog("ContactInfo Created", "ContactInfo",
-                String.valueOf(saved.getContactId()), saved.getContactId(), "Created new contact info");
+        
         return toDTO(saved);
     }
 
@@ -39,8 +35,7 @@ public class ContactInfoService {
         }
         ContactInfo contactInfo = toEntity(contactInfoDTO);
         ContactInfo updated = contactInfoRepository.save(contactInfo);
-        sendAuditLog("ContactInfo Updated", "ContactInfo",
-                String.valueOf(updated.getContactId()), updated.getContactId(), "Updated contact info");
+        
         return toDTO(updated);
     }
 
@@ -72,15 +67,5 @@ public class ContactInfoService {
         return dto;
     }
 
-    private void sendAuditLog(String action, String entityName, String entityId,
-                              Long customerId, String details) {
-        AuditLogDTO auditLogDTO = new AuditLogDTO();
-        auditLogDTO.setAction(action);
-        auditLogDTO.setEntityName(entityName);
-        auditLogDTO.setEntityId(entityId);
-        auditLogDTO.setCustomerId(customerId);
-        auditLogDTO.setTimestamp(LocalDateTime.now());
-        auditLogDTO.setDetails(details);
-        auditClient.sendAuditLog(auditLogDTO);
-    }
+    
 }

@@ -1,0 +1,12 @@
+package com.example.mohan.controller;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/v1/notifications")
+@RequiredArgsConstructor
+public class NotificationController {
+    // This controller is now empty as the notification process is driven by Kafka.
+    // The previous endpoint has been removed.
+}
