@@ -1,6 +1,9 @@
 package com.example.mohan.feign;
 
 import com.example.mohan.dto.ProfileDTO;
+
+import java.util.List;
+
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,4 +18,7 @@ public interface AccountFeignClient {
 
     @PostMapping("/credit")
     void creditAccount(@RequestParam String accountNumber, @RequestParam double amount);
+    
+    @GetMapping("/contactId/{contactId}")
+    List<ProfileDTO> getProfilesByContactId(@PathVariable("contactId") Long contactId);
 }

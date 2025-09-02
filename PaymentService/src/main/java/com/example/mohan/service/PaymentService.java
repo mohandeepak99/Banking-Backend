@@ -10,10 +10,17 @@ import com.example.mohan.exception.PaymentException;
 import com.example.mohan.feign.AccountFeignClient;
 import com.example.mohan.kafka.PaymentProducer;
 import com.example.mohan.repository.PaymentRepository;
+
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +30,7 @@ public class PaymentService {
     private final AccountFeignClient accountFeignClient;
     private final PaymentProducer paymentProducer;
 
+    @Transactional
     public PaymentResponseDTO doPayment(PaymentRequestDTO request) {
 
         // Validate sender account
@@ -94,5 +102,36 @@ public class PaymentService {
         dto.setAmount(payment.getAmount());
         dto.setPaymentStatus(payment.getPaymentStatus());
         return dto;
+    }
+
+    /** NEW: return all payments where the user is either sender or receiver */
+    public List<PaymentResponseDTO> getPaymentsForUser(Long userId) {
+        // Get all accounts for the given user
+        List<ProfileDTO> profiles = accountFeignClient.getProfilesByContactId(userId);
+        if (profiles == null || profiles.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // Extract account numbers
+        Set<String> accountNumbers = profiles.stream()
+                .map(ProfileDTO::getAccountNumber)
+                .collect(Collectors.toSet());
+
+        // Query payments by sender or receiver account
+        List<String> accountNumberList = new ArrayList<>(accountNumbers);
+        List<Payment> payments =
+            paymentRepository.findBySenderAccountNumberInOrReceiverAccountNumberIn(accountNumberList, accountNumberList);
+
+        // Map to response DTO
+        return payments.stream().map(payment -> {
+            PaymentResponseDTO dto = new PaymentResponseDTO();
+            dto.setPaymentId(payment.getPaymentId());
+            dto.setSenderAccountNumber(payment.getSenderAccountNumber());
+            dto.setReceiverAccountNumber(payment.getReceiverAccountNumber());
+            dto.setPaymentTime(payment.getPaymentTime());
+            dto.setAmount(payment.getAmount());
+            dto.setPaymentStatus(payment.getPaymentStatus());
+            return dto;
+        }).collect(Collectors.toList());
     }
 }

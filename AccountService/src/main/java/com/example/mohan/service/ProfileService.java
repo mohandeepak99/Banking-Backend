@@ -9,6 +9,10 @@ import com.example.mohan.exception.ProfileNotFoundException;
 import com.example.mohan.feign.CustomerFeignClient;
 import com.example.mohan.repository.ProfileRepository;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -113,6 +117,12 @@ public class ProfileService {
     		profileRepository.deleteById(profileId);
     		
 
+    }
+
+    public List<ProfileDTO> getProfilesByContactId(Long contactId) {
+        return profileRepository.findByContactId(contactId).stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 
 }

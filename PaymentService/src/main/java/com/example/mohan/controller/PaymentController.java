@@ -5,6 +5,9 @@ import com.example.mohan.dto.PaymentResponseDTO;
 import com.example.mohan.service.PaymentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,5 +27,15 @@ public class PaymentController {
     @GetMapping("/{paymentId}")
     public PaymentResponseDTO getPaymentDetails(@PathVariable Long paymentId) {
         return paymentService.getPaymentDetails(paymentId);
+    }
+    
+    @GetMapping("/history")
+    public List<PaymentResponseDTO> getPaymentHistory(@RequestParam Long userId) {
+        return paymentService.getPaymentsForUser(userId);
+    }
+    
+    @GetMapping("/history/{userId}")
+    public List<PaymentResponseDTO> getPaymentsForUser(@PathVariable Long userId) {
+        return paymentService.getPaymentsForUser(userId);
     }
 }

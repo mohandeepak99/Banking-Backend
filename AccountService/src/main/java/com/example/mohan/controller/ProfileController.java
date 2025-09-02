@@ -4,6 +4,9 @@ import com.example.mohan.dto.ProfileDTO;
 import com.example.mohan.service.ProfileService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
@@ -50,6 +53,12 @@ public class ProfileController {
     
     public void deleteProfileById(@PathVariable Long profileId) {
         profileService.deleteProfileById(profileId);
+    }
+    
+    
+    @GetMapping("/contactId/{contactId}")
+    public List<ProfileDTO> getProfilesByContactId(@PathVariable Long contactId) {
+        return profileService.getProfilesByContactId(contactId);
     }
 
 
